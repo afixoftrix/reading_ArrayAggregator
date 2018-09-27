@@ -4,81 +4,65 @@
 //Then it returns a function that takes in an array/object and uses its arguments as function to deal with them.
 
 //arguments: setter and initializer
-let dependencies = {
-    arrayAggregator: {
-        value: require("arrayAggregator"),
-        args: {
-            array: {
-                type: "Array",
-                description: "The array to be iterated over."
-            },
-            setter: {
-                type: "Function",
-                description: "Initial state to be iterated upon"
-            },
-            iteratee: {
-                type: "Function",
-                description: "The iteratees to transform keys"
-            },
-            accumulator: {
-                type: "Object",
-                description: "How the "
-            }
-        },
-        returnValue: {
-            type: "Function",
-            description: "Returns an Accumulator"
-        }
-    },
-    baseAggregator: {
-        value: require("baseAggregator"),
-        args: {
-            collection: {
-                type: "Array or Object",
-                description: "The collection to iterate over"
-            },
-            setter: {
-                type: "Function",
-                description: "The function to set accumulator values"
-            },
-            iteratee: {
-                type: "Function",
-                description: "The data structure being iterated over that transform keys"
-            },
-            accumulator: {
-                type: "Object",
-                description: "The initial aggregated object"
-            }
-        },
-        returnValue: {
-            type: "Function",
-            description: "Returns an accumulator"
-        }
-    },
-    baseIteratee: {
-        value: require("baseIteratee"),
-        args: {
-            star: {
-                type: "Any",
-                description: "Takes in some params to turn into an iteratee"
-            }
-        }
-    },
-    isArray: {
-        value: require("isArray"),
-        args: {
-            value: {
-                type: "Any",
-                description: "Take a javascript value."
-            }
-        },
-        returnValue: {
-            type: "Boolean",
-            description: "Tells if the value passed to 'isArray' is of type 'Array'"
-        }
+const accumulator = ["a", "g"]
+const array = [1, "d", 4, "s", 4, 2, "f", 4]
+const iteratee = value => {
+    if (typeof value === "string") {
+        return value + " key"
     }
-};
+}
+const setter = (accumulator, val, mink = iteratee(val), ray) => {
+    if (typeof val === "string") {
+        accumulator.push({[`${mink}`]: val})
+    }
+}
+
 
 const args = {
-    
+    array: {
+        value: array,
+        type: "array",
+        desc: "Array that you want to work on"
+    },
+    setter: {
+        value: setter,
+        type: "function",
+        desc: "The logic of how the array is morphed"
+    },
+    iteratee: {
+        value: iteratee,
+        type: "function",
+        desc: "Operates on the keys."
+    },
+    accumulator: {
+        value: accumulator,
+        type: "array",
+        desc: "An inital array that the return can propagate from"
+    }
 }
+
+const expected = {
+    value: ['a', 'g', { 'd key': 'd' }, { 's key': 's' }, { 'f key': 'f' }],
+    type: "array"
+}
+
+{
+    let retVal
+    let index = 0
+    let length = args.array.value.length
+
+    while (index < length){
+        let val = args.array.value[index]
+        args.setter.value(
+            args.accumulator.value,
+            val,
+            args.iteratee.value,
+            args.accumulator.value
+        )
+        index = index + 1
+    }
+
+}
+/** learned aboubt the difference btw ++i and i++ 
+ * 
+*/
